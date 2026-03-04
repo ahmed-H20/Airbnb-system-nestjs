@@ -8,6 +8,7 @@ import { ConfigService } from '@nestjs/config';
 export class AuthService {
   constructor(
     private configService: ConfigService,
+    private 
     private readonly usersService: UsersService,
   ) {}
   async signup(newUserData: CreateUserDto) {
