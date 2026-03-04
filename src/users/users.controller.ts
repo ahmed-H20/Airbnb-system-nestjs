@@ -10,7 +10,7 @@ import {
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { User } from './schemas/user.schema';
-import { ParseMongoIdPipe } from 'src/mongo-db/pipes/parse-mongo-id.pipe';
+import { ParseMongoIdPipe } from 'src/common/pipes/parse-mongo-id.pipe';
 import { UpdateUserDto } from './dtos/update-user.dto';
 
 @Controller('users')
