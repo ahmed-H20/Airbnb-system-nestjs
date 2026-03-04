@@ -11,7 +11,7 @@ async function bootstrap() {
       forbidNonWhitelisted: true,
     }),
   );
-  app.setGlobalPrefix('api/v1');
+  app.setGlobalPrefix('api/v1'); // for change Base url
   await app.listen(process.env.PORT ?? 3000);
 }
 bootstrap();
