@@ -5,7 +5,14 @@ import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
 
 @Module({
-  imports: [ConfigModule.forRoot(), UsersModule, MongoDbModule, AuthModule],
+  imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
+    UsersModule,
+    MongoDbModule,
+    AuthModule,
+  ],
   providers: [],
 })
 export class AppModule {}
