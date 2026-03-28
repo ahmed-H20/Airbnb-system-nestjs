@@ -11,7 +11,7 @@ export class CountriesService {
     @InjectModel(Country.name) private countryModel: Model<Country>,
   ) {}
 
-  // Create new user
+  // Create new country
   createCountry = async (country: CreateCountryDto): Promise<Country> => {
     const newCountry = await this.countryModel.create(country);
     return newCountry;
@@ -24,7 +24,7 @@ export class CountriesService {
   };
 
   // Get one user
-  getUserById = async (id: string): Promise<Country> => {
+  getCountryById = async (id: string): Promise<Country> => {
     const user = await this.countryModel.findById(id);
     if (!user) {
       throw new NotFoundException(`there is no country for this id: ${id}`);
@@ -40,7 +40,7 @@ export class CountriesService {
     const updatedCountry = await this.countryModel.findByIdAndUpdate(
       id,
       UpdateUserdata,
-      { new: true },
+      { returnDocument: 'after' },
     );
 
     if (!updatedCountry) {

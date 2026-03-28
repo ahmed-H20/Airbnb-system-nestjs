@@ -1,5 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument } from 'mongoose';
+import { Role } from 'src/auth/enums/role.enum';
 
 @Schema()
 export class User {
@@ -14,6 +15,9 @@ export class User {
 
   @Prop({ required: [true, 'phoneNumber of user is required'], unique: true })
   phoneNumber: string;
+
+  @Prop({ default: Role.User, type: String, enum: Role })
+  role: Role;
 }
 
 export type UserDocument = HydratedDocument<User>; // Create mongoose Document

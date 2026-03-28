@@ -1,40 +1,59 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Put,
+  UseGuards,
+} from '@nestjs/common';
 import { CountriesService } from './countries.service';
+import { CreateCountryDto } from './dtos/create-country.dto';
+import { Country } from './schemas/countries.schema';
+import { ParseMongoIdPipe } from 'src/common/pipes/parse-mongo-id.pipe';
+import { UpdateCountryDto } from './dtos/update-country.dto';
+import { AuthGuard } from 'src/auth/guards/auth.guard';
+import { Roles } from 'src/auth/decorators/role.decorator';
+import { Role } from 'src/auth/enums/role.enum';
+import { RolesGuard } from 'src/auth/guards/role.guard';
 
+@Roles(Role.Admin)
+@UseGuards(AuthGuard, RolesGuard)
 @Controller('countries')
 export class CountriesController {
   constructor(private readonly countryService: CountriesService) {}
 
   // Create new country
   @Post()
-  create(@Body() createUserDto: CreateUserDto): Promise<User> {
-    return this.userService.createUser(createUserDto);
+  create(@Body() CreateCountryDto: CreateCountryDto): Promise<Country> {
+    return this.countryService.createCountry(CreateCountryDto);
   }
 
-  // Get all users
+  // Get all countries
   @Get()
-  getAll(): Promise<User[]> {
-    return this.userService.getAllUsers();
+  getAll(): Promise<Country[]> {
+    return this.countryService.getAllCountries();
   }
 
-  // Get one user
+  // Get one country
   @Get(':id')
-  getOne(@Param('id', ParseMongoIdPipe) id: string): Promise<User> {
-    return this.userService.getUserById(id);
+  getOne(@Param('id', ParseMongoIdPipe) id: string): Promise<Country> {
+    return this.countryService.getCountryById(id);
   }
 
-  // Update user
+  // Update country
   @Put('/:id')
   updateOne(
     @Param('id', ParseMongoIdPipe) id: string,
-    @Body() updateUser: UpdateUserDto,
-  ): Promise<User> {
-    return this.userService.updateUser(id, updateUser);
+    @Body() updateCountry: UpdateCountryDto,
+  ): Promise<Country> {
+    return this.countryService.updateCountry(id, updateCountry);
   }
 
-  // Delete user
+  // Delete country
   @Delete('/:id')
   deleteOne(@Param('id', ParseMongoIdPipe) id: string): Promise<object> {
-    return this.userService.deleteUser(id);
+    return this.countryService.deleteCountry(id);
   }
 }

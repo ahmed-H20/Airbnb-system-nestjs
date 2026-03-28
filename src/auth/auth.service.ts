@@ -8,6 +8,7 @@ import { LoginDto } from './dtos/login.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { User } from 'src/users/schemas/user.schema';
 import { Model } from 'mongoose';
+// import { Role } from './enums/role.enum';
 
 @Injectable()
 export class AuthService {
@@ -29,6 +30,8 @@ export class AuthService {
       ...newUserData,
       password,
     });
+
+    console.log(user);
 
     // 3- generate token
     const payload = { sub: user._id.toString() };

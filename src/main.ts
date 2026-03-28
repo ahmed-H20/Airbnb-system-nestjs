@@ -1,6 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { ValidationPipe } from '@nestjs/common';
+import { BadRequestException, ValidationPipe } from '@nestjs/common';
 import cookieParser from 'cookie-parser';
 import { HttpExceptionFilter } from './common/filters/costum-HttpExeption.filter';
 import { HttpMongoFilter } from './common/filters/costum-mongoExeption.filter';
@@ -9,9 +9,16 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.useGlobalPipes(
     new ValidationPipe({
-      disableErrorMessages: true,
       whitelist: true,
       forbidNonWhitelisted: true,
+      disableErrorMessages: false,
+      transform: true,
+      exceptionFactory: (errors) => {
+        throw new BadRequestException({
+          field: errors[0].property,
+          errors: Object.values(errors[0].constraints || {}),
+        });
+      },
     }),
   );
 

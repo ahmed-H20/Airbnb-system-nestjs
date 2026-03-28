@@ -1,10 +1,12 @@
 import {
   IsEmail,
+  // IsEnum,
   IsPhoneNumber,
   IsString,
   Length,
   MinLength,
 } from 'class-validator';
+// import { Role } from 'src/auth/enums/role.enum';
 
 export class CreateUserDto {
   @Length(3, 20)
@@ -20,4 +22,7 @@ export class CreateUserDto {
 
   @IsPhoneNumber()
   readonly phoneNumber: string;
+
+  // @IsEnum(Role)
+  // role: Role;
 }
