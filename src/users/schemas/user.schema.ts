@@ -4,6 +4,8 @@ import { Role } from 'src/auth/enums/role.enum';
 
 @Schema()
 export class User {
+  _id: string;
+
   @Prop({ required: [true, 'user name of user is required'] })
   name: string;
 

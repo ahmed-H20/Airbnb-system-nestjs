@@ -8,6 +8,7 @@ import { JwtService } from '@nestjs/jwt';
 import { InjectModel } from '@nestjs/mongoose';
 import { Request } from 'express';
 import { Model } from 'mongoose';
+import { Admin } from 'src/admins/schemas/admin.schema';
 import { User } from 'src/users/schemas/user.schema';
 
 @Injectable()
@@ -15,6 +16,7 @@ export class AuthGuard implements CanActivate {
   constructor(
     private jwtService: JwtService,
     @InjectModel(User.name) private userModel: Model<User>,
+    @InjectModel(Admin.name) private adminModel: Model<Admin>,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -34,15 +36,14 @@ export class AuthGuard implements CanActivate {
 
       // token will include only user id
       // so we get user from id
-      const user = await this.userModel.findById(payload.sub);
+      const user =
+        (await this.userModel.findById(payload.sub)) ||
+        (await this.adminModel.findOne({ _id: payload.sub }));
       if (!user) {
         throw new UnauthorizedException();
       }
-      console.log(user);
 
       request['user'] = user;
-
-      console.log(request);
     } catch (err) {
       console.log(err);
 

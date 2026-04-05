@@ -2,12 +2,14 @@ import { Module } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
-import { UsersModule } from 'src/users/users.module';
 import { AuthController } from './auth.controller';
-import { MongooseModule } from '@nestjs/mongoose';
-import { User, UserSchema } from 'src/users/schemas/user.schema';
 import { AuthGuard } from './guards/auth.guard';
 import { RolesGuard } from './guards/role.guard';
+import { MongooseModule } from '@nestjs/mongoose';
+import { User, UserSchema } from 'src/users/schemas/user.schema';
+import { Admin, AdminSchema } from 'src/admins/schemas/admin.schema';
+import { UsersModule } from 'src/users/users.module';
+import { AdminsModule } from 'src/admins/admins.module';
 
 @Module({
   imports: [
@@ -19,10 +21,17 @@ import { RolesGuard } from './guards/role.guard';
         signOptions: { expiresIn: configService.get('JWT_EXPIRE_TIME') },
       }),
     }),
+    MongooseModule.forFeature([
+      { name: User.name, schema: UserSchema },
+      {
+        name: Admin.name,
+        schema: AdminSchema,
+      },
+    ]),
     UsersModule,
-    MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
+    AdminsModule,
   ],
-  exports: [AuthGuard],
+  exports: [AuthGuard, MongooseModule],
   providers: [AuthService, AuthGuard, RolesGuard],
   controllers: [AuthController],
 })

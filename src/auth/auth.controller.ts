@@ -37,4 +37,18 @@ export class AuthController {
 
     return { message: 'Login in successfully' };
   }
+
+  @Post('/login/admin')
+  async adminLogin(
+    @Res({ passthrough: true }) res: Response,
+    @Body() loginData: LoginDto,
+  ) {
+    const token = await this.auth.adminLogin(loginData);
+
+    res.cookie('token', token, {
+      httpOnly: true,
+    });
+
+    return { message: 'Login in successfully' };
+  }
 }

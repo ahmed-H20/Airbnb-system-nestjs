@@ -5,6 +5,8 @@ import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
 import { CountriesModule } from './countries/countries.module';
 import { CitiesModule } from './cities/cities.module';
+import { AdminsModule } from './admins/admins.module';
+import { UnitsModule } from './units/units.module';
 
 @Module({
   imports: [
@@ -16,6 +18,8 @@ import { CitiesModule } from './cities/cities.module';
     AuthModule,
     CountriesModule,
     CitiesModule,
+    AdminsModule,
+    UnitsModule,
   ],
   providers: [],
 })

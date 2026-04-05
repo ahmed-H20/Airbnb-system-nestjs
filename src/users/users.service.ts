@@ -30,6 +30,14 @@ export class UsersService {
     return user;
   };
 
+  getUser = async (obj: object): Promise<User> => {
+    const user = await this.userModel.findOne(obj);
+    if (!user) {
+      throw new NotFoundException(`there is no user`);
+    }
+    return user;
+  };
+
   // Update user
   updateUser = async (
     id: string,

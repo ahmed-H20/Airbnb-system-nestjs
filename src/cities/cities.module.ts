@@ -5,6 +5,7 @@ import { CitiesSchema, City } from './schemas/city.schema';
 import { CitiesController } from './cities.controller';
 import { CountriesModule } from 'src/countries/countries.module';
 import { UsersModule } from 'src/users/users.module';
+import { AuthModule } from 'src/auth/auth.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { UsersModule } from 'src/users/users.module';
       },
     ]),
     CountriesModule,
+    AuthModule,
     UsersModule,
   ],
   providers: [CitiesService],
