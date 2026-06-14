@@ -7,7 +7,9 @@ import { AuthGuard } from 'src/auth/guards/auth.guard';
 import { RolesGuard } from 'src/auth/guards/role.guard';
 import { Admin } from './schemas/admin.schema';
 import { MongoIdDto } from 'src/mongo-db/dtos/mongo-id.dto';
+import { ApiExcludeController } from '@nestjs/swagger';
 
+@ApiExcludeController()
 @Roles(Role.Admin)
 @UseGuards(AuthGuard, RolesGuard)
 @Controller('admins')

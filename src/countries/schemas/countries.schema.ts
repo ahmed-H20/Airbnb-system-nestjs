@@ -4,10 +4,10 @@ import { HydratedDocument } from 'mongoose';
 @Schema({ timestamps: true })
 export class Country {
   @Prop({ required: [true, 'country name is required'] })
-  name: string;
+  name!: string;
 
-  @Prop({ required: [true, ' of user is required'], unique: true })
-  code: string;
+  @Prop({ required: [true, 'country code is required'], unique: true })
+  code!: string;
 }
 
 export const CountrySchema = SchemaFactory.createForClass(Country);

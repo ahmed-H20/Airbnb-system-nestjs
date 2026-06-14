@@ -4,10 +4,10 @@ import { Types } from 'mongoose';
 @Schema({ timestamps: true })
 export class City {
   @Prop()
-  name: string;
+  name!: string;
 
   @Prop({ type: Types.ObjectId, ref: 'Country' })
-  country: string;
+  country!: string;
 }
 
 export const CitiesSchema = SchemaFactory.createForClass(City);

@@ -4,22 +4,22 @@ import { Role } from 'src/auth/enums/role.enum';
 
 @Schema()
 export class User {
-  _id: string;
+  _id?: string;
 
   @Prop({ required: [true, 'user name of user is required'] })
-  name: string;
+  name!: string;
 
   @Prop({ required: [true, 'email of user is required'], unique: true })
-  email: string;
+  email!: string;
 
   @Prop({ required: [true, 'password of user is required'] })
-  password: string;
+  password!: string;
 
   @Prop({ required: [true, 'phoneNumber of user is required'], unique: true })
-  phoneNumber: string;
+  phoneNumber!: string;
 
   @Prop({ default: Role.User, type: String, enum: Role })
-  role: Role;
+  role!: Role;
 }
 
 export type UserDocument = HydratedDocument<User>; // Create mongoose Document

@@ -7,6 +7,8 @@ import { CountriesModule } from './countries/countries.module';
 import { CitiesModule } from './cities/cities.module';
 import { AdminsModule } from './admins/admins.module';
 import { UnitsModule } from './units/units.module';
+import { CategoriesModule } from './categories/categories.module';
+import { ReservationsModule } from './reservations/reservations.module';
 
 @Module({
   imports: [
@@ -20,6 +22,8 @@ import { UnitsModule } from './units/units.module';
     CitiesModule,
     AdminsModule,
     UnitsModule,
+    CategoriesModule,
+    ReservationsModule,
   ],
   providers: [],
 })
