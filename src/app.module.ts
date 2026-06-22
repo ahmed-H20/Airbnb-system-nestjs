@@ -9,6 +9,11 @@ import { AdminsModule } from './admins/admins.module';
 import { UnitsModule } from './units/units.module';
 import { CategoriesModule } from './categories/categories.module';
 import { ReservationsModule } from './reservations/reservations.module';
+import { FavouritesModule } from './favourites/favourites.module';
+import { NotificationsModule } from './notifications/notifications.module';
+import { ReviewsModule } from './reviews/reviews.module';
+import { CurrenciesModule } from './currencies/currencies.module';
+import { FollowersModule } from './followers/followers.module';
 
 @Module({
   imports: [
@@ -24,6 +29,11 @@ import { ReservationsModule } from './reservations/reservations.module';
     UnitsModule,
     CategoriesModule,
     ReservationsModule,
+    FavouritesModule,
+    NotificationsModule,
+    ReviewsModule,
+    CurrenciesModule,
+    FollowersModule,
   ],
   providers: [],
 })

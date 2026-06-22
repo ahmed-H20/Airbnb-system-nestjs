@@ -1,6 +1,15 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { IsDate, IsMongoId, IsNumber, IsString, Min } from 'class-validator';
+import {
+  IsDate,
+  IsEnum,
+  IsMongoId,
+  IsNumber,
+  IsOptional,
+  IsString,
+  Min,
+} from 'class-validator';
+import { ReservationStatus } from '../enums/ReservationStatus.enum';
 
 export class CreateReservationDto {
   @ApiProperty({
@@ -10,21 +19,6 @@ export class CreateReservationDto {
   @IsString()
   @IsMongoId()
   readonly unit!: string;
-
-  @ApiProperty({
-    example: 3,
-    description: 'The number of days for the reservation',
-  })
-  @IsNumber()
-  readonly numberOfDays!: number;
-
-  @ApiProperty({
-    example: 100,
-    description: 'The price per night for the reservation',
-  })
-  @IsNumber()
-  @Min(1)
-  readonly price!: number;
 
   @ApiProperty({
     type: String,
@@ -45,4 +39,23 @@ export class CreateReservationDto {
   @Type(() => Date)
   @IsDate()
   readonly checkOutDate!: Date;
+
+  @ApiProperty({
+    example: 100,
+    description: 'The price per night for the reservation',
+  })
+  @IsNumber()
+  @Min(1)
+  readonly pricePerNight!: number;
+
+  // These fields exist in the schema but are typically set by the system.
+  @ApiProperty({
+    required: false,
+    enum: ReservationStatus,
+    example: ReservationStatus.PENDING,
+    description: 'Reservation status (defaults to PENDING)',
+  })
+  @IsOptional()
+  @IsEnum(ReservationStatus)
+  readonly status?: ReservationStatus;
 }

@@ -1,4 +1,9 @@
-import { ConflictException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateReservationDto } from './dto/create-reservation.dto';
 import { UpdateReservationDto } from './dto/update-reservation.dto';
 import { InjectModel } from '@nestjs/mongoose';
@@ -6,11 +11,13 @@ import { Reservation } from './schemas/reservation.schema';
 import { Model } from 'mongoose';
 import { ReservationStatus } from './enums/ReservationStatus.enum';
 import { User } from 'src/users/schemas/user.schema';
+import { NotificationsService } from 'src/notifications/notifications.service';
 
 @Injectable()
 export class ReservationsService {
   constructor(
     @InjectModel(Reservation.name) private reservationModel: Model<Reservation>,
+    private readonly notificationsService: NotificationsService,
   ) {}
 
   async createRequest(createReservationDto: CreateReservationDto, user: User) {
@@ -40,47 +47,64 @@ export class ReservationsService {
 
     const newReservation = new this.reservationModel({
       ...createReservationDto,
-      totalPrice:
-        createReservationDto.numberOfDays * createReservationDto.price,
-      pricePerNight: createReservationDto.price,
       user: user._id,
     });
+
     await newReservation.save();
 
     return createReservationDto;
   }
 
-  findAll() {
-    return this.reservationModel.find();
+  findAll(user: User) {
+    return this.reservationModel.find({
+      status: {
+        $ne: ReservationStatus.CANCELLED,
+      },
+      user: user._id,
+    });
   }
 
-  findOne(id: number) {
+  findOne(id: string) {
     return this.reservationModel.findById(id);
   }
 
   // ===============================
 
   async updatePendingReservation(
-    id: number,
+    id: string,
     updateReservationDto: UpdateReservationDto,
   ) {
-    const updatedReservation = await this.reservationModel.findById(id);
+    const reservation = await this.reservationModel.findById(id);
 
-    if (!updatedReservation) {
-      throw new Error('Reservation not found');
+    if (!reservation) {
+      throw new NotFoundException('Reservation not found');
     }
 
-    if (updatedReservation.status.toString() !== 'pending') {
-      throw new Error('Only pending reservations can be updated');
+    if (reservation.status !== ReservationStatus.PENDING) {
+      throw new BadRequestException('Only pending reservations can be updated');
     }
 
-    Object.assign(updatedReservation, updateReservationDto);
-    return updatedReservation.save();
+    Object.assign(reservation, updateReservationDto);
+
+    if (reservation.checkOutDate <= reservation.checkInDate) {
+      throw new BadRequestException(
+        'Check-out date must be after check-in date',
+      );
+    }
+
+    const numberOfDays = Math.ceil(
+      (reservation.checkOutDate.getTime() - reservation.checkInDate.getTime()) /
+        (1000 * 60 * 60 * 24),
+    );
+
+    reservation.totalPrice = reservation.pricePerNight * numberOfDays;
+
+    return await reservation.save();
   }
 
   //=====================================
 
-  async completeAcceptedReservation(id: number) {
+  async completeAcceptedReservation(id: string) {
     const updatedReservation = await this.reservationModel.findById(id);
 
     if (!updatedReservation) {
@@ -94,12 +118,21 @@ export class ReservationsService {
       throw new Error('Only accepted reservations can be completed');
     }
     updatedReservation.status = ReservationStatus.COMPLETED;
-    return updatedReservation.save();
+    await updatedReservation.save();
+
+    // 🔔 Notify the guest that reservation is completed
+    await this.notificationsService.notifyReservationStatusChange({
+      recipientId: updatedReservation.user.toString(),
+      reservationId: updatedReservation._id.toString(),
+      status: ReservationStatus.COMPLETED,
+    });
+
+    return updatedReservation;
   }
 
   //=====================================
 
-  async cancelAcceptedReservation(id: number) {
+  async cancelAcceptedReservation(id: string) {
     const updatedReservation = await this.reservationModel.findById(id);
 
     if (!updatedReservation) {
@@ -112,12 +145,21 @@ export class ReservationsService {
       throw new Error('Only accepted reservations can be cancelled');
     }
     updatedReservation.status = ReservationStatus.CANCELLED;
-    return updatedReservation.save();
+    await updatedReservation.save();
+
+    // 🔔 Notify the guest that reservation is cancelled
+    await this.notificationsService.notifyReservationStatusChange({
+      recipientId: updatedReservation.user.toString(),
+      reservationId: updatedReservation._id.toString(),
+      status: ReservationStatus.CANCELLED,
+    });
+
+    return updatedReservation;
   }
 
   //=====================================
 
-  remove(id: number) {
+  remove(id: string) {
     return this.reservationModel.findByIdAndDelete(id);
   }
 

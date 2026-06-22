@@ -23,14 +23,14 @@ import { ApiResponse } from 'node_modules/@nestjs/swagger/dist/decorators/api-re
 import { ApiBearerAuth } from '@nestjs/swagger';
 import type { RequestWithUser } from 'src/common/interfaces/request-with-user.interface';
 
+@ApiBearerAuth('JWT-token')
 @UseGuards(AuthGuard, RolesGuard)
 @Controller('reservations')
 export class ReservationsController {
   constructor(private readonly reservationsService: ReservationsService) {}
 
-  @Roles(Role.Guest, Role.User) //TODO: check if this is correct
+  @Roles(Role.Guest, Role.User)
   @Post()
-  @ApiBearerAuth('JWT-token')
   @ApiOperation({
     summary: 'Create Reservation',
     description: 'Create a new reservation for a specific unit.',
@@ -54,7 +54,7 @@ export class ReservationsController {
     );
   }
 
-  @Roles(Role.Host, Role.Guest) //TODO: check if this is correct
+  @Roles(Role.Host, Role.Guest)
   @Get()
   @ApiOperation({
     summary: 'Get Reservations',
@@ -68,11 +68,11 @@ export class ReservationsController {
     status: 404,
     description: 'No reservations found.',
   })
-  findAll() {
-    return this.reservationsService.findAll();
+  findAll(@Req() req: RequestWithUser) {
+    return this.reservationsService.findAll(req.user);
   }
 
-  @Roles(Role.Host, Role.Guest) //TODO: check if this is correct
+  @Roles(Role.Host, Role.Guest)
   @Get(':id')
   @ApiOperation({
     summary: 'Get Reservation',
@@ -87,10 +87,12 @@ export class ReservationsController {
     description: 'Reservation not found.',
   })
   findOne(@Param('id') id: string) {
-    return this.reservationsService.findOne(+id);
+    return this.reservationsService.findOne(id);
   }
 
-  @Roles(Role.Guest) //TODO: check if this is correct
+  //=============================
+
+  @Roles(Role.Guest)
   @Patch(':id')
   @ApiOperation({
     summary: 'Update Reservation',
@@ -110,12 +112,14 @@ export class ReservationsController {
     @Body() updateReservationDto: UpdateReservationDto,
   ) {
     return this.reservationsService.updatePendingReservation(
-      +id,
+      id,
       updateReservationDto,
     );
   }
 
-  @Roles(Role.Host) //TODO: check if this is correct
+  //=============================
+
+  @Roles(Role.Host)
   @Post(':id/complete')
   @ApiOperation({
     summary: 'Complete Reservation',
@@ -126,10 +130,12 @@ export class ReservationsController {
     description: 'Reservation marked as completed successfully.',
   })
   complete(@Param('id') id: string) {
-    return this.reservationsService.completeAcceptedReservation(+id);
+    return this.reservationsService.completeAcceptedReservation(id);
   }
 
-  @Roles(Role.Host) //TODO: check if this is correct
+  //=============================
+
+  @Roles(Role.Host, Role.Guest)
   @Delete(':id')
   @ApiOperation({
     summary: 'Cancel Reservation',
@@ -140,6 +146,6 @@ export class ReservationsController {
     description: 'Reservation canceled successfully.',
   })
   remove(@Param('id') id: string) {
-    return this.reservationsService.remove(+id);
+    return this.reservationsService.remove(id);
   }
 }
