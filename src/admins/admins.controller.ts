@@ -23,7 +23,7 @@ import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 @UseGuards(AuthGuard, RolesGuard)
 @Controller('admins')
 export class AdminsController {
-  constructor(private readonly adminServices: AdminsService) {}
+  constructor(private readonly adminServices: AdminsService) { }
 
   @Post()
   @ApiOperation({ summary: 'Create a new admin' })
@@ -52,13 +52,13 @@ export class AdminsController {
   // ============ Booking Orders (3.15) ============
 
   @Get('reservations')
-  @ApiOperation({ summary: 'View all booking orders (3.15.1)' })
+  @ApiOperation({ summary: 'View all booking orders' })
   getAllReservations() {
     return this.adminServices.getAllReservations();
   }
 
   @Get('reservations/:id')
-  @ApiOperation({ summary: 'View booking order details (3.15.2)' })
+  @ApiOperation({ summary: 'View booking order detail' })
   getReservationById(@Param('id') id: string) {
     return this.adminServices.getReservationById(id);
   }
