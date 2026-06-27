@@ -49,7 +49,6 @@ export class AdminsController {
     return this.adminServices.active(id);
   }
 
-  // ============ Booking Orders (3.15) ============
 
   @Get('reservations')
   @ApiOperation({ summary: 'View all booking orders' })
