@@ -35,4 +35,12 @@ export class ReviewsController {
   remove(@Param('id') id: string, @Req() req: RequestWithUser) {
     return this.reviewsService.remove(id, req.user);
   }
+
+  // View own reviews (3.2.4)
+  @Roles(Role.Guest, Role.User, Role.Host)
+  @Get('my-reviews')
+  getMyReviews(@Req() req: RequestWithUser) {
+    return this.reviewsService.findMyReviews(req.user._id as string);
+  }
 }
+

@@ -48,6 +48,17 @@ export class CreateReservationDto {
   @Min(1)
   readonly pricePerNight!: number;
 
+  @ApiProperty({
+    example: 2,
+    description: 'Total number of guests (adults + kids)',
+    required: false,
+    default: 1,
+  })
+  @IsOptional()
+  @IsNumber()
+  @Min(1)
+  readonly numberOfGuests?: number;
+
   // These fields exist in the schema but are typically set by the system.
   @ApiProperty({
     required: false,

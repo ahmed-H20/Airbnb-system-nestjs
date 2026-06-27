@@ -14,6 +14,7 @@ import { NotificationsModule } from './notifications/notifications.module';
 import { ReviewsModule } from './reviews/reviews.module';
 import { CurrenciesModule } from './currencies/currencies.module';
 import { FollowersModule } from './followers/followers.module';
+import { AppSettingsModule } from './app-settings/app-settings.module';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { FollowersModule } from './followers/followers.module';
     ReviewsModule,
     CurrenciesModule,
     FollowersModule,
+    AppSettingsModule,
   ],
   providers: [],
 })

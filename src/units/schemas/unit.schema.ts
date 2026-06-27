@@ -57,7 +57,19 @@ export class Unit {
 
   @Prop({ default: true })
   isActive!: boolean;
+
+  // Currency reference
+  @Prop({ type: Types.ObjectId, ref: 'Currency', default: null })
+  currency?: string;
+
+  // Computed rating fields (updated when reviews are added)
+  @Prop({ default: 0, min: 0, max: 5 })
+  averageRating!: number;
+
+  @Prop({ default: 0, min: 0 })
+  reviewsCount!: number;
 }
 
 export const unitSchema = SchemaFactory.createForClass(Unit);
 export type unitDocument = HydratedDocument<Unit>;
+

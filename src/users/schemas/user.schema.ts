@@ -2,7 +2,7 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument } from 'mongoose';
 import { Role } from 'src/auth/enums/role.enum';
 
-@Schema()
+@Schema({ timestamps: true })
 export class User {
   _id?: string;
 
@@ -20,6 +20,19 @@ export class User {
 
   @Prop({ default: Role.User, type: String, enum: Role })
   role!: Role;
+
+  @Prop({ default: null })
+  profilePicture?: string;
+
+  @Prop({ default: false })
+  isBlocked!: boolean;
+
+  // OTP fields for forgot-password flow
+  @Prop({ default: null })
+  otp?: string;
+
+  @Prop({ default: null })
+  otpExpiry?: Date;
 }
 
 export type UserDocument = HydratedDocument<User>; // Create mongoose Document

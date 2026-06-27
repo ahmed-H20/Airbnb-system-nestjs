@@ -17,13 +17,11 @@ import { Role } from 'src/auth/enums/role.enum';
 import { RolesGuard } from 'src/auth/guards/role.guard';
 import { AuthGuard } from 'src/auth/guards/auth.guard';
 import { Roles } from 'src/auth/decorators/role.decorator';
-import { ApiOperation } from 'node_modules/@nestjs/swagger/dist/decorators/api-operation.decorator';
-import { ApiBody } from 'node_modules/@nestjs/swagger/dist/decorators/api-body.decorator';
-import { ApiResponse } from 'node_modules/@nestjs/swagger/dist/decorators/api-response.decorator';
-import { ApiBearerAuth } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import type { RequestWithUser } from 'src/common/interfaces/request-with-user.interface';
 
 @ApiBearerAuth('JWT-token')
+@ApiTags('Reservations')
 @UseGuards(AuthGuard, RolesGuard)
 @Controller('reservations')
 export class ReservationsController {
@@ -31,120 +29,78 @@ export class ReservationsController {
 
   @Roles(Role.Guest, Role.User)
   @Post()
-  @ApiOperation({
-    summary: 'Create Reservation',
-    description: 'Create a new reservation for a specific unit.',
-  })
+  @ApiOperation({ summary: 'Create Reservation' })
   @ApiBody({ type: CreateReservationDto })
-  @ApiResponse({
-    status: 201,
-    description: 'Reservation created successfully.',
-  })
-  @ApiResponse({
-    status: 400,
-    description: 'Validation failed.',
-  })
+  @ApiResponse({ status: 201, description: 'Reservation created successfully.' })
+  @ApiResponse({ status: 400, description: 'Validation failed.' })
   create(
     @Body() createReservationDto: CreateReservationDto,
     @Req() req: RequestWithUser,
   ): Promise<CreateReservationDto> {
-    return this.reservationsService.createRequest(
-      createReservationDto,
-      req.user,
-    );
+    return this.reservationsService.createRequest(createReservationDto, req.user);
   }
 
   @Roles(Role.Host, Role.Guest)
   @Get()
-  @ApiOperation({
-    summary: 'Get Reservations',
-    description: 'Retrieve all reservations.',
-  })
-  @ApiResponse({
-    status: 200,
-    description: 'Reservations retrieved successfully.',
-  })
-  @ApiResponse({
-    status: 404,
-    description: 'No reservations found.',
-  })
+  @ApiOperation({ summary: 'Get my Reservations' })
   findAll(@Req() req: RequestWithUser) {
     return this.reservationsService.findAll(req.user);
   }
 
   @Roles(Role.Host, Role.Guest)
   @Get(':id')
-  @ApiOperation({
-    summary: 'Get Reservation',
-    description: 'Retrieve a specific reservation by ID.',
-  })
-  @ApiResponse({
-    status: 200,
-    description: 'Reservation retrieved successfully.',
-  })
-  @ApiResponse({
-    status: 404,
-    description: 'Reservation not found.',
-  })
+  @ApiOperation({ summary: 'Get Reservation by ID' })
   findOne(@Param('id') id: string) {
     return this.reservationsService.findOne(id);
   }
 
-  //=============================
-
+  // ===== Guest: Update pending reservation =====
   @Roles(Role.Guest)
   @Patch(':id')
-  @ApiOperation({
-    summary: 'Update Reservation',
-    description: 'Update a specific reservation by ID.',
-  })
+  @ApiOperation({ summary: 'Guest updates a pending reservation' })
   @ApiBody({ type: UpdateReservationDto })
-  @ApiResponse({
-    status: 200,
-    description: 'Reservation updated successfully.',
-  })
-  @ApiResponse({
-    status: 404,
-    description: 'Reservation not found.',
-  })
   update(
     @Param('id') id: string,
     @Body() updateReservationDto: UpdateReservationDto,
+    @Req() req: RequestWithUser,
   ) {
     return this.reservationsService.updatePendingReservation(
       id,
       updateReservationDto,
+      req.user,
     );
   }
 
-  //=============================
+  // ===== Host: Accept a pending reservation =====
+  @Roles(Role.Host)
+  @Post(':id/accept')
+  @ApiOperation({ summary: 'Host accepts a pending reservation' })
+  @ApiResponse({ status: 200, description: 'Reservation accepted.' })
+  accept(@Param('id') id: string) {
+    return this.reservationsService.acceptReservation(id);
+  }
 
+  // ===== Host: Decline a pending reservation =====
+  @Roles(Role.Host)
+  @Post(':id/decline')
+  @ApiOperation({ summary: 'Host declines a pending reservation' })
+  @ApiResponse({ status: 200, description: 'Reservation declined.' })
+  decline(@Param('id') id: string) {
+    return this.reservationsService.declineReservation(id);
+  }
+
+  // ===== Host: Complete an accepted reservation =====
   @Roles(Role.Host)
   @Post(':id/complete')
-  @ApiOperation({
-    summary: 'Complete Reservation',
-    description: 'Mark a specific accepted reservation as completed.',
-  })
-  @ApiResponse({
-    status: 200,
-    description: 'Reservation marked as completed successfully.',
-  })
+  @ApiOperation({ summary: 'Host marks an accepted reservation as completed' })
   complete(@Param('id') id: string) {
     return this.reservationsService.completeAcceptedReservation(id);
   }
 
-  //=============================
-
+  // ===== Host/Guest: Cancel =====
   @Roles(Role.Host, Role.Guest)
   @Delete(':id')
-  @ApiOperation({
-    summary: 'Cancel Reservation',
-    description: 'Cancel a specific reservation by ID.',
-  })
-  @ApiResponse({
-    status: 200,
-    description: 'Reservation canceled successfully.',
-  })
+  @ApiOperation({ summary: 'Cancel a reservation' })
   remove(@Param('id') id: string) {
     return this.reservationsService.remove(id);
   }

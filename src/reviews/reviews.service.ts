@@ -85,4 +85,18 @@ export class ReviewsService {
     }
     return await this.reviewModel.findByIdAndDelete(id);
   }
+
+  async findMyReviews(userId: string) {
+    const reviews = await this.reviewModel
+      .find({ user: userId })
+      .populate('unit', 'name address photos')
+      .populate('reservation', 'checkInDate checkOutDate')
+      .sort({ createdAt: -1 });
+
+    return {
+      total: reviews.length,
+      reviews,
+    };
+  }
 }
+

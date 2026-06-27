@@ -31,6 +31,12 @@ export class Reservation {
   @Prop({ required: true })
   totalPrice!: number;
 
+  @Prop({ default: 0 })
+  vatAmount!: number;
+
+  @Prop({ default: 1, min: 1 })
+  numberOfGuests!: number;
+
   @Prop({
     enum: ReservationStatus,
     default: ReservationStatus.PENDING,
@@ -40,3 +46,4 @@ export class Reservation {
 
 export const ReservationSchema = SchemaFactory.createForClass(Reservation);
 export type ReservationDocument = Reservation & Document;
+

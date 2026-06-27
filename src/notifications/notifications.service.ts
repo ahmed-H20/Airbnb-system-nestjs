@@ -9,7 +9,7 @@ export class NotificationsService {
   constructor(
     @InjectModel(Notification.name)
     private notificationModel: Model<Notification>,
-  ) {}
+  ) { }
 
   /**
    * Create a notification (used internally by the system).
@@ -116,6 +116,10 @@ export class NotificationsService {
         title: 'Reservation Cancelled',
         message: `Your reservation${data.unitName ? ` for "${data.unitName}"` : ''} has been cancelled.`,
       },
+      declined: {
+        title: 'Reservation Declined',
+        message: `Your reservation${data.unitName ? ` for "${data.unitName}"` : ''} has been declined by the host.`,
+      },
     };
 
     const statusKey = data.status.toLowerCase();
@@ -129,6 +133,7 @@ export class NotificationsService {
       accepted: NotificationType.RESERVATION_ACCEPTED,
       completed: NotificationType.RESERVATION_COMPLETED,
       cancelled: NotificationType.RESERVATION_CANCELLED,
+      declined: NotificationType.RESERVATION_CANCELLED,
     };
 
     return this.create({
@@ -139,4 +144,37 @@ export class NotificationsService {
       reservationId: data.reservationId,
     });
   };
+
+  /**
+   * Send notification to a group
+   */
+  sendGroupNotification = async (data: {
+    group: 'all' | 'hosts' | 'guests';
+    title: string;
+    message: string;
+    userModel: Model<any>;
+  }): Promise<{ sent: number }> => {
+    const roleFilter =
+      data.group === 'hosts'
+        ? 'host'
+        : data.group === 'guests'
+          ? 'guest'
+          : null;
+
+    const query = roleFilter ? { role: roleFilter } : {};
+    const users = await data.userModel.find(query).select('_id');
+
+    const notifications = users.map((u) =>
+      this.create({
+        recipientId: u._id.toString(),
+        title: data.title,
+        message: data.message,
+        type: NotificationType.ADMIN_MESSAGE,
+      }),
+    );
+
+    await Promise.all(notifications);
+    return { sent: users.length };
+  };
 }
+
